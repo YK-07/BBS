@@ -1,7 +1,60 @@
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.db import IntegrityError
+from django.contrib.auth import authenticate, login
+#from .models import ReviewModel
+#from django.views.generic import CreateView
+#from django.urls import reverse_lazy
 
 # Create your views here.
 
-def hello(request):
-    return HttpResponse('<p>Hello world</p>')
+def IndexView(request):
+    return render(request, 'bbsApp/index.html')
+
+def SignupView(request):
+    if request.method == 'POST':
+        username_data = request.POST['username_data']
+        password_data = request.POST['password_data']
+        
+        try:
+            User.objects.create_user(username_data, '', password_data)
+
+        except IntegrityError:
+            return render(request, 'bbsApp/signup.html', {'error': 'このユーザーは既に登録されています。'})
+    else:
+        #print(User.objects.all())
+        return render(request, "bbsApp/signup.html", {})
+    
+    return render(request, "bbsApp/signup.html", {})
+
+def LoginView(request):
+    if request.method == 'POST':
+        username_data = request.POST['username_data']
+        password_data = request.POST['password_data']
+        user = authenticate(request, username=username_data, password=password_data)
+        if user is not None:
+            login(request, user)
+            return redirect('list')#list がエラーになる、not found
+
+        else:
+            return redirect('login')
+    return render(request, 'bbsApp/login.html')
+
+def MainView(request):
+    return render(request, 'bbsApp/main.html')
+
+"""
+def listview(request):
+    object_list = ReviewModel.objects.all()
+    return render(request, 'bbsApp/main.html', { 'object_list':object_list})
+
+def detailview(request, pk):
+    object = ReviewModel.objects.get(pk=pk)
+    return render(request, 'bbsApp/detail.html', {'object':object})
+
+class CreateClass(CreateView):
+    template_name = 'bbsApp/create.html'
+    model = ReviewModel
+    fields = ('title', 'content', 'author', 'images', 'evaluation')
+    success_url = reverse_lazy('list')
+"""
