@@ -3,9 +3,30 @@
 
 {% block title %}メイン{% endblock %}
 
-{% block header %}{% endblock header %}
+{% block header %}
+<link rel="stylesheet" href="{% static 'css\main.css' %}">
+{% endblock header %}
 
 {% block content %}
+<div class='container'>
+    {% for item in object_list %}
+    <div class="card">
+        <h5 class="card-header">{{ item.title }}</h5>
+        <div class="card-body">
 
+            <h5 class="card-title">投稿者：{{ item.user }}</h5>
+
+            <h5 class="card-title">内容：{{ item.content|truncatechars:20 }}</h5>
+            <h5 class="card-title">レビューが参考になった人：{{ item.useful_review }}人</h5>
+            <a href="{% url 'main' %}" class="btn btn-primary">詳しく見る</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 
 {% endblock %}
+<!--
+<p><img src='{{item.images.url}}' width=300></p>
+<h5 class="card-title">投稿者：{{ item.user }}</h5>
+<h5 class="card-title">{{ item.images }}</h5>
+-->

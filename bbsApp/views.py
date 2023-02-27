@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.db import IntegrityError
 from django.contrib.auth import authenticate, login
-#from .models import ReviewModel
-#from django.views.generic import CreateView
-#from django.urls import reverse_lazy
+from .models import bbsModel
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
 
 # Create your views here.
 
@@ -34,27 +34,28 @@ def LoginView(request):
         user = authenticate(request, username=username_data, password=password_data)
         if user is not None:
             login(request, user)
-            return redirect('list')#list がエラーになる、not found
+            #userがいればこの処理が行われる
+            return redirect('create')
 
         else:
-            return redirect('login')
+            #userがいなければればこの処理が行われる
+            #return redirect('login')
+            return render(request, 'bbsApp/login.html', {'error': 'ユーザー名かパスワードが間違っています。'})
     return render(request, 'bbsApp/login.html')
 
+#ListViewと同義
 def MainView(request):
-    return render(request, 'bbsApp/main.html')
+    object_list = bbsModel.objects.all()
+    return render(request, 'bbsApp/main.html', {'object_list':object_list})
 
-"""
-def listview(request):
-    object_list = ReviewModel.objects.all()
-    return render(request, 'bbsApp/main.html', { 'object_list':object_list})
-
-def detailview(request, pk):
-    object = ReviewModel.objects.get(pk=pk)
+def DetailView(request, pk):
+    object = bbsModel.objects.get(pk=pk)
     return render(request, 'bbsApp/detail.html', {'object':object})
 
 class CreateClass(CreateView):
     template_name = 'bbsApp/create.html'
-    model = ReviewModel
-    fields = ('title', 'content', 'author', 'images', 'evaluation')
-    success_url = reverse_lazy('list')
-"""
+    model = bbsModel
+    fields = ('title', 'content', 'user', 'evaluation')
+    success_url = reverse_lazy('main')
+
+
